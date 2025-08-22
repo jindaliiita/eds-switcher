@@ -1,15 +1,15 @@
 {
   "manifest_version": 3,
-  "name": "EDS Page Switcher",
+  "name": "AEM Page Switcher",
   "version": "1.0",
-  "description": "Switch between original website and EDS (Edge Delivery Services) pages",
+  "description": "Switch between original website and Edge Delivery Services pages",
   "permissions": [
     "activeTab",
     "storage"
   ],
   "action": {
     "default_popup": "popup.html",
-    "default_title": "EDS Page Switcher"
+    "default_title": "AEM Page Switcher"
   },
   "content_scripts": [
     {
@@ -18,9 +18,9 @@
     }
   ],
   "icons": {
-    "16": "icon.jpg",
-    "48": "icon.jpg",
-    "128": "icon.jpg"
+    "16": "icon1.png",
+    "48": "icon1.png",
+    "128": "icon1.png"
   },
   "options_page": "settings.html"
 }

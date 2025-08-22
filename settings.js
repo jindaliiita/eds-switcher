@@ -85,7 +85,6 @@ class DomainMappingManager {
   async autoConfigureMapping() {
     const originalUrl = document.getElementById('sampleOriginalUrl').value.trim();
     const edsUrl = document.getElementById('sampleEdsUrl').value.trim();
-    const defaultExtension = document.getElementById('autoExtension').value;
 
     if (!originalUrl || !edsUrl) {
       this.showStatus('Please enter both sample URLs', 'error');
@@ -93,8 +92,10 @@ class DomainMappingManager {
     }
 
     try {
-      const originalDomain = new URL(originalUrl).hostname;
-      const edsDomain = new URL(edsUrl).hostname;
+      const originalUrlObj = new URL(originalUrl);
+      const edsUrlObj = new URL(edsUrl);
+      const originalDomain = originalUrlObj.hostname;
+      const edsDomain = edsUrlObj.hostname;
 
       // Validate domains
       if (!this.isValidDomain(originalDomain) || !this.isValidDomain(edsDomain)) {
@@ -102,17 +103,20 @@ class DomainMappingManager {
         return;
       }
 
+      // Auto-detect file extension from the original URL
+      const originalPath = originalUrlObj.pathname;
+      const detectedExtension = this.detectFileExtension(originalPath);
+
       // Add bidirectional mapping
       this.mappings.set(originalDomain.toLowerCase(), edsDomain.toLowerCase());
       this.mappings.set(edsDomain.toLowerCase(), originalDomain.toLowerCase());
 
-      // Store extension preference if specified
-      if (defaultExtension && defaultExtension !== '') {
+      // Store detected extension preference
+      if (detectedExtension) {
         const extensionKey = `${edsDomain.toLowerCase()}->${originalDomain.toLowerCase()}-extension`;
-        const extensionValue = defaultExtension === 'none' ? '' : defaultExtension;
         
         try {
-          await chrome.storage.sync.set({ [extensionKey]: extensionValue });
+          await chrome.storage.sync.set({ [extensionKey]: detectedExtension });
         } catch (error) {
           console.error('Error saving extension preference:', error);
         }
@@ -121,14 +125,37 @@ class DomainMappingManager {
       // Clear inputs
       document.getElementById('sampleOriginalUrl').value = '';
       document.getElementById('sampleEdsUrl').value = '';
-      document.getElementById('autoExtension').value = '';
 
       await this.saveMappings();
       this.renderMappings();
-      this.showStatus(`✅ Successfully configured mapping: ${originalDomain} ↔ ${edsDomain}`, 'success');
+      
+      let statusMessage = `✅ Successfully configured mapping: ${originalDomain} ↔ ${edsDomain}`;
+      if (detectedExtension) {
+        statusMessage += `\n🔧 Auto-detected file extension: ${detectedExtension}`;
+      }
+      this.showStatus(statusMessage, 'success');
     } catch (error) {
       this.showStatus('Error parsing URLs: ' + error.message, 'error');
     }
+  }
+
+  // Helper method to detect file extension from URL path
+  detectFileExtension(path) {
+    const commonExtensions = ['.html', '.htm', '.php', '.aspx', '.jsp'];
+    
+    for (const ext of commonExtensions) {
+      if (path.toLowerCase().endsWith(ext)) {
+        return ext;
+      }
+    }
+    
+    // Check for any file extension pattern
+    const extensionMatch = path.match(/(\.[a-zA-Z0-9]+)$/);
+    if (extensionMatch) {
+      return extensionMatch[1];
+    }
+    
+    return null; // No extension detected
   }
 
   async addMapping() {
