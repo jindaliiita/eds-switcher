@@ -174,8 +174,8 @@ async function updatePopup(currentUrl) {
   const targetUrl = await convertUrl(currentUrl);
   
   if (targetUrl) {
-    // Immediate switch - redirect directly to target page
-    chrome.tabs.update({ url: targetUrl });
+    // Immediate switch - open target page in new tab
+    chrome.tabs.create({ url: targetUrl });
     window.close();
     return;
   } else {
