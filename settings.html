@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>EDS Page Switcher Settings</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    
+    .container {
+      background: white;
+      border-radius: 8px;
+      padding: 30px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 20px;
+    }
+    
+    .title {
+      font-size: 24px;
+      font-weight: 600;
+      color: #333;
+      margin: 0;
+    }
+    
+    .subtitle {
+      font-size: 14px;
+      color: #666;
+      margin: 10px 0 0 0;
+    }
+    
+    .section {
+      margin-bottom: 30px;
+    }
+    
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 15px;
+    }
+    
+    .quick-setup {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .input-group {
+      margin-bottom: 15px;
+    }
+    
+    .input-group label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 5px;
+      color: #333;
+    }
+    
+    .input-group input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    
+    .input-group input:focus {
+      outline: none;
+      border-color: #007cba;
+      box-shadow: 0 0 0 2px rgba(0, 124, 186, 0.2);
+    }
+    
+    .example {
+      font-size: 12px;
+      color: #666;
+      margin-top: 5px;
+      font-style: italic;
+    }
+    
+    .button {
+      background: #007cba;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+    
+    .button:hover {
+      background: #005a87;
+    }
+    
+    .button.secondary {
+      background: #6c757d;
+    }
+    
+    .button.secondary:hover {
+      background: #545b62;
+    }
+    
+    .button.danger {
+      background: #dc3545;
+    }
+    
+    .button.danger:hover {
+      background: #c82333;
+    }
+    
+    .mappings-list {
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    
+    .mapping-item {
+      padding: 15px;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .mapping-item:last-child {
+      border-bottom: none;
+    }
+    
+    .mapping-info {
+      flex: 1;
+    }
+    
+    .mapping-original {
+      font-weight: 500;
+      color: #333;
+      margin-bottom: 5px;
+    }
+    
+    .mapping-eds {
+      font-size: 12px;
+      color: #666;
+    }
+    
+    .mapping-actions {
+      display: flex;
+      gap: 5px;
+    }
+    
+    .button.small {
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+    
+    .status-message {
+      padding: 10px;
+      border-radius: 4px;
+      margin-bottom: 15px;
+      display: none;
+    }
+    
+    .status-message.success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    
+    .status-message.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: #666;
+      font-style: italic;
+    }
+    
+    .help-text {
+      background: #e7f3ff;
+      border: 1px solid #b8daff;
+      border-radius: 4px;
+      padding: 15px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      color: #004085;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1 class="title">Edge Delivery Services Page Switcher Settings</h1>
+      <p class="subtitle">Configure your domain mappings for seamless switching</p>
+    </div>
+    
+    <div class="help-text">
+      <strong>How it works:</strong> Add your original website domain and its corresponding Edge Delivery Services domain below. 
+      Once configured, the extension will automatically switch between them for any page on those domains.
+      <br><br>
+      <strong>File Extensions:</strong> The extension intelligently handles file extensions:
+      <ul style="margin: 10px 0; padding-left: 20px;">
+        <li><strong>Original → Edge Delivery Services:</strong> Automatically removes .html, .htm, .php, .aspx, .jsp extensions</li>
+        <li><strong>Edge Delivery Services → Original:</strong> Adds your configured extension (defaults to .html)</li>
+        <li><strong>Examples:</strong> 
+          <br>• <code>www.site.com/page.html</code> → <code>main--www--site.aem.page/page</code>
+          <br>• <code>main--www--site.aem.page/page</code> → <code>www.site.com/page.html</code>
+        </li>
+      </ul>
+    </div>
+    
+    <div class="section">
+      <div class="section-title">🚀 Quick Setup (Recommended)</div>
+      <div class="quick-setup">
+        <div id="statusMessage" class="status-message"></div>
+        
+        <div class="input-group">
+          <label for="sampleOriginalUrl">Sample Original Website URL</label>
+          <input type="text" id="sampleOriginalUrl" placeholder="https://www.example.com/any/page">
+          <div class="example">Paste any URL from your original website</div>
+        </div>
+        
+        <div class="input-group">
+          <label for="sampleEdsUrl">Sample Edge Delivery Services URL</label>
+          <input type="text" id="sampleEdsUrl" placeholder="https://main--www--example.aem.page/any/page">
+          <div class="example">Paste the corresponding Edge Delivery Services URL</div>
+        </div>
+        
+        <div class="input-group">
+          <label for="autoExtension">Default File Extension (optional)</label>
+          <select id="autoExtension">
+            <option value="">Auto-detect</option>
+            <option value=".html">.html</option>
+            <option value=".htm">.htm</option>
+            <option value=".php">.php</option>
+            <option value=".aspx">.aspx</option>
+            <option value=".jsp">.jsp</option>
+            <option value="none">No extension</option>
+          </select>
+          <div class="example">Extension to add when converting from Edge Delivery Services to original site</div>
+        </div>
+        
+        <button id="extractAndAdd" class="button">🎯 Auto-Configure Domain Mapping</button>
+      </div>
+    </div>
+    
+    <div class="section">
+      <div class="section-title">⚙️ Manual Configuration</div>
+      <div class="quick-setup">
+        <div class="input-group">
+          <label for="originalDomain">Original Website Domain</label>
+          <input type="text" id="originalDomain" placeholder="www.example.com">
+          <div class="example">Example: www.cmegroup.com</div>
+        </div>
+        
+        <div class="input-group">
+          <label for="edsDomain">Edge Delivery Services Domain</label>
+          <input type="text" id="edsDomain" placeholder="main--www--example.aem.page">
+          <div class="example">Example: main--www--cmegroup.aem.page</div>
+        </div>
+        
+        <div class="input-group">
+          <label for="defaultExtension">Default File Extension (optional)</label>
+          <select id="defaultExtension">
+            <option value="">Auto-detect</option>
+            <option value=".html">.html</option>
+            <option value=".htm">.htm</option>
+            <option value=".php">.php</option>
+            <option value=".aspx">.aspx</option>
+            <option value=".jsp">.jsp</option>
+            <option value="none">No extension</option>
+          </select>
+          <div class="example">Extension to add when converting from Edge Delivery Services to original site</div>
+        </div>
+        
+        <button id="addMapping" class="button">Add Mapping</button>
+      </div>
+    </div>
+    
+    <div class="section">
+      <div class="section-title">Current Domain Mappings</div>
+      <div id="mappingsList" class="mappings-list">
+        <div class="empty-state">
+          No domain mappings configured yet. Add your first mapping above.
+        </div>
+      </div>
+      
+      <div style="margin-top: 15px;">
+        <button id="exportMappings" class="button secondary">Export Mappings</button>
+        <button id="importMappings" class="button secondary">Import Mappings</button>
+        <button id="clearAll" class="button danger">Clear All</button>
+        <input type="file" id="fileInput" accept=".json" style="display: none;">
+      </div>
+    </div>
+  </div>
+  
+  <script src="settings.js"></script>
+</body>
+</html>

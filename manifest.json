@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "EDS Page Switcher",
+  "version": "1.0",
+  "description": "Switch between original website and EDS (Edge Delivery Services) pages",
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "EDS Page Switcher"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ],
+  "icons": {
+    "16": "icon.jpg",
+    "48": "icon.jpg",
+    "128": "icon.jpg"
+  },
+  "options_page": "settings.html"
+}
