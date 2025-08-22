@@ -22,20 +22,25 @@ A Chrome extension that allows you to easily switch between original website pag
 
 ## Installation
 
-### Method 1: Load as Unpacked Extension (Developer Mode)
+### 🚀 Quick Install (2 minutes)
 
-1. **Enable Developer Mode**:
-   - Open Chrome and go to `chrome://extensions/`
-   - Toggle "Developer mode" on (top right corner)
+1. **Download**: 
+   - Click the green "Code" button above → "Download ZIP"
+   - Extract the ZIP file
 
-2. **Load the Extension**:
-   - Click "Load unpacked"
-   - Select the `eds-switcher` folder containing the extension files
-   - The extension should now appear in your extensions list
+2. **Install in Chrome**:
+   - Open `chrome://extensions/` in Chrome
+   - Enable "Developer mode" (top-right toggle)
+   - Click "Load unpacked" → Select the extracted folder
+   - Done! ✅
 
-3. **Pin the Extension**:
-   - Click the puzzle piece icon (Extensions) in the Chrome toolbar
-   - Find "EDS Page Switcher" and click the pin icon to keep it visible
+3. **Pin Extension** (optional):
+   - Click puzzle piece icon (🧩) in Chrome toolbar
+   - Pin "Edge Delivery Services Switcher"
+
+📖 **Detailed guide**: See [INSTALL_GUIDE.md](INSTALL_GUIDE.md) for step-by-step instructions with screenshots.
+
+### Alternative Methods
 
 ### Method 2: Package and Install
 
