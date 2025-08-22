@@ -23,6 +23,8 @@ class DomainMappingManager {
     }
   }
 
+
+
   async saveMappings() {
     try {
       const mappingsObj = Object.fromEntries(this.mappings);
@@ -40,10 +42,9 @@ class DomainMappingManager {
       this.autoConfigureMapping();
     });
 
-    // Add mapping button (manual)
-    document.getElementById('addMapping').addEventListener('click', () => {
-      this.addMapping();
-    });
+
+
+
 
     // Export mappings
     document.getElementById('exportMappings').addEventListener('click', () => {
@@ -64,15 +65,7 @@ class DomainMappingManager {
       this.clearAllMappings();
     });
 
-    // Enter key support
-    ['originalDomain', 'edsDomain'].forEach(id => {
-      document.getElementById(id).addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-          this.addMapping();
-        }
-      });
-    });
-
+    // Enter key support for Quick Setup
     ['sampleOriginalUrl', 'sampleEdsUrl'].forEach(id => {
       document.getElementById(id).addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
@@ -107,20 +100,37 @@ class DomainMappingManager {
       const originalPath = originalUrlObj.pathname;
       const detectedExtension = this.detectFileExtension(originalPath);
 
-      // Add bidirectional mapping
-      this.mappings.set(originalDomain.toLowerCase(), edsDomain.toLowerCase());
-      this.mappings.set(edsDomain.toLowerCase(), originalDomain.toLowerCase());
-
-      // Store detected extension preference
-      if (detectedExtension) {
-        const extensionKey = `${edsDomain.toLowerCase()}->${originalDomain.toLowerCase()}-extension`;
+      // Add bidirectional mapping with auto .page/.live domains
+      const edsTargets = [edsDomain.toLowerCase()];
+      
+      // Auto-add complementary domain
+      if (edsDomain.includes('.aem.page')) {
+        const liveDomain = edsDomain.replace('.aem.page', '.aem.live');
+        edsTargets.push(liveDomain.toLowerCase());
+      } else if (edsDomain.includes('.aem.live')) {
+        const pageDomain = edsDomain.replace('.aem.live', '.aem.page');
+        edsTargets.push(pageDomain.toLowerCase());
+      }
+      
+      // Store all EDS targets for the original domain
+      for (const target of edsTargets) {
+        this.mappings.set(target, originalDomain.toLowerCase());
         
-        try {
-          await chrome.storage.sync.set({ [extensionKey]: detectedExtension });
-        } catch (error) {
-          console.error('Error saving extension preference:', error);
+        // Store extension preference for each EDS domain
+        if (detectedExtension) {
+          const extensionKey = `${target}->${originalDomain.toLowerCase()}-extension`;
+          try {
+            await chrome.storage.sync.set({ [extensionKey]: detectedExtension });
+          } catch (error) {
+            console.error('Error saving extension preference:', error);
+          }
         }
       }
+      
+      // Store all EDS targets as a comma-separated string for the original domain
+      this.mappings.set(originalDomain.toLowerCase(), edsTargets.join(','));
+
+
 
       // Clear inputs
       document.getElementById('sampleOriginalUrl').value = '';
@@ -129,7 +139,11 @@ class DomainMappingManager {
       await this.saveMappings();
       this.renderMappings();
       
-      let statusMessage = `✅ Successfully configured mapping: ${originalDomain} ↔ ${edsDomain}`;
+      let statusMessage = `✅ Successfully configured mapping: ${originalDomain}`;
+      if (edsTargets.length > 1) {
+        statusMessage += `\n✅ Auto-added both .page and .live domains`;
+      }
+      statusMessage += `\n🎯 EDS targets: ${edsTargets.join(', ')}`;
       if (detectedExtension) {
         statusMessage += `\n🔧 Auto-detected file extension: ${detectedExtension}`;
       }
@@ -158,50 +172,7 @@ class DomainMappingManager {
     return null; // No extension detected
   }
 
-  async addMapping() {
-    const originalDomain = document.getElementById('originalDomain').value.trim();
-    const edsDomain = document.getElementById('edsDomain').value.trim();
-    const defaultExtension = document.getElementById('defaultExtension').value;
 
-    if (!originalDomain || !edsDomain) {
-      this.showStatus('Please enter both original and EDS domains', 'error');
-      return;
-    }
-
-    // Clean up domains (remove protocol and paths)
-    const cleanOriginal = this.cleanDomain(originalDomain);
-    const cleanEds = this.cleanDomain(edsDomain);
-
-    // Validate domains
-    if (!this.isValidDomain(cleanOriginal) || !this.isValidDomain(cleanEds)) {
-      this.showStatus('Please enter valid domain names', 'error');
-      return;
-    }
-
-    // Add bidirectional mapping
-    this.mappings.set(cleanOriginal, cleanEds);
-    this.mappings.set(cleanEds, cleanOriginal);
-
-    // Store extension preference if specified
-    if (defaultExtension && defaultExtension !== '') {
-      const extensionKey = `${cleanEds}->${cleanOriginal}-extension`;
-      const extensionValue = defaultExtension === 'none' ? '' : defaultExtension;
-      
-      try {
-        await chrome.storage.sync.set({ [extensionKey]: extensionValue });
-      } catch (error) {
-        console.error('Error saving extension preference:', error);
-      }
-    }
-
-    // Clear inputs
-    document.getElementById('originalDomain').value = '';
-    document.getElementById('edsDomain').value = '';
-    document.getElementById('defaultExtension').value = '';
-
-    this.saveMappings();
-    this.renderMappings();
-  }
 
 
 

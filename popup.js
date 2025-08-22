@@ -7,6 +7,7 @@ async function loadDomainMappings() {
     const result = await chrome.storage.sync.get(['domainMappings']);
     if (result.domainMappings) {
       domainMappings = new Map(Object.entries(result.domainMappings));
+      console.log('Loaded domain mappings:', Array.from(domainMappings.entries()));
     }
   } catch (error) {
     console.error('Error loading domain mappings:', error);
@@ -23,20 +24,27 @@ function isEDSPage(url) {
   }
 }
 
-// Function to convert URL using stored domain mappings
+// Function to convert URL using stored domain mappings with smart target selection
 async function convertUrl(currentUrl) {
   try {
     const urlObj = new URL(currentUrl);
     const currentDomain = urlObj.hostname.toLowerCase();
     
-    // Check if we have a mapping for this domain
-    const targetDomain = domainMappings.get(currentDomain);
+    const isCurrentEDS = isEDSPage(currentUrl);
+    let targetDomain;
+    
+    if (isCurrentEDS) {
+      // Coming from EDS (.page or .live) → Go to original
+      targetDomain = domainMappings.get(currentDomain);
+    } else {
+      // Coming from original → Smart EDS selection
+      targetDomain = selectBestEDSTarget(currentDomain);
+    }
     
     if (targetDomain) {
       let targetPath = urlObj.pathname;
       
       // Handle file extensions intelligently
-      const isCurrentEDS = isEDSPage(currentUrl);
       const isTargetEDS = targetDomain.includes('.aem.');
       
       if (!isCurrentEDS && isTargetEDS) {
@@ -56,6 +64,53 @@ async function convertUrl(currentUrl) {
     console.error('Error converting URL:', e);
     return null;
   }
+}
+
+// Smart function to select the best EDS target when coming from original site
+function selectBestEDSTarget(originalDomain) {
+  console.log('selectBestEDSTarget called with:', originalDomain);
+  console.log('All domain mappings:', Array.from(domainMappings.entries()));
+  
+  // Get EDS targets for this original domain (stored as comma-separated string)
+  const targetsString = domainMappings.get(originalDomain);
+  
+  if (!targetsString) {
+    console.log('No targets found for domain:', originalDomain);
+    return null;
+  }
+  
+  // Parse comma-separated targets
+  const possibleTargets = targetsString.split(',').map(target => target.trim());
+  console.log('Found targets:', possibleTargets);
+  
+  if (possibleTargets.length === 0) {
+    console.log('No targets found, returning null');
+    return null;
+  }
+  
+  if (possibleTargets.length === 1) {
+    console.log('Only one target found:', possibleTargets[0]);
+    return possibleTargets[0];
+  }
+   
+  // If multiple targets available, prefer .live over .page
+  // .live is typically the production environment
+  const liveTarget = possibleTargets.find(target => target.includes('.aem.live'));
+  if (liveTarget) {
+    console.log('Selected .live target:', liveTarget);
+    return liveTarget;
+  }
+  
+  // Fallback to .page if .live not available
+  const pageTarget = possibleTargets.find(target => target.includes('.aem.page'));
+  if (pageTarget) {
+    console.log('Fallback to .page target:', pageTarget);
+    return pageTarget;
+  }
+  
+  // Fallback to first available target
+  console.log('Fallback to first target:', possibleTargets[0]);
+  return possibleTargets[0];
 }
 
 // Function to remove common file extensions when going to EDS
@@ -119,14 +174,10 @@ async function updatePopup(currentUrl) {
   const targetUrl = await convertUrl(currentUrl);
   
   if (targetUrl) {
-    const buttonText = isEDS ? 'Open Original Website' : 'Open Edge Delivery Services Page';
-    switchButton.textContent = buttonText;
-    switchButton.disabled = false;
-    switchButton.onclick = () => {
-      chrome.tabs.create({ url: targetUrl });
-      window.close();
-    };
-    errorElement.style.display = 'none';
+    // Immediate switch - redirect directly to target page
+    chrome.tabs.update({ url: targetUrl });
+    window.close();
+    return;
   } else {
     switchButton.textContent = 'No Domain Mapping Found';
     switchButton.disabled = true;

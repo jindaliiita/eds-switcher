@@ -213,19 +213,20 @@
       <strong>How it works:</strong> Add your original website domain and its corresponding Edge Delivery Services domain below. 
       Once configured, the extension will automatically switch between them for any page on those domains.
       <br><br>
-      <strong>File Extensions:</strong> The extension intelligently handles file extensions:
+      <strong>Smart Features:</strong>
       <ul style="margin: 10px 0; padding-left: 20px;">
-        <li><strong>Original → Edge Delivery Services:</strong> Automatically removes .html, .htm, .php, .aspx, .jsp extensions</li>
-        <li><strong>Edge Delivery Services → Original:</strong> Adds your configured extension (defaults to .html)</li>
+        <li><strong>Auto .live domains:</strong> When you add a .aem.page domain, the corresponding .aem.live domain is automatically added</li>
+        <li><strong>File extensions:</strong> Automatically removes .html, .htm, .php, .aspx, .jsp from original → EDS, and adds them back for EDS → original</li>
+        <li><strong>One-click switching:</strong> Extension directly switches pages by default (configurable in settings)</li>
         <li><strong>Examples:</strong> 
-          <br>• <code>www.site.com/page.html</code> → <code>main--www--site.aem.page/page</code>
-          <br>• <code>main--www--site.aem.page/page</code> → <code>www.site.com/page.html</code>
+          <br>• <code>https://www.site.com/page.html</code> → <code>https://main--www--site.aem.page/page</code> or <code>https://main--www--site.aem.live/page</code>
+          <br>• <code>https://main--www--site.aem.page/page</code> → <code>https://www.site.com/page.html</code>
         </li>
       </ul>
     </div>
     
     <div class="section">
-      <div class="section-title">🚀 Quick Setup (Recommended)</div>
+      <div class="section-title">🚀 Setup</div>
       <div class="quick-setup">
         <div id="statusMessage" class="status-message"></div>
         
@@ -242,39 +243,6 @@
         </div>
         
         <button id="extractAndAdd" class="button">🎯 Auto-Configure Domain Mapping</button>
-      </div>
-    </div>
-    
-    <div class="section">
-      <div class="section-title">⚙️ Manual Configuration</div>
-      <div class="quick-setup">
-        <div class="input-group">
-          <label for="originalDomain">Original Website Domain</label>
-          <input type="text" id="originalDomain" placeholder="www.example.com">
-          <div class="example">Example: www.cmegroup.com</div>
-        </div>
-        
-        <div class="input-group">
-          <label for="edsDomain">Edge Delivery Services Domain</label>
-          <input type="text" id="edsDomain" placeholder="main--www--example.aem.page">
-          <div class="example">Example: main--www--cmegroup.aem.page</div>
-        </div>
-        
-        <div class="input-group">
-          <label for="defaultExtension">Default File Extension (optional)</label>
-          <select id="defaultExtension">
-            <option value="">Auto-detect</option>
-            <option value=".html">.html</option>
-            <option value=".htm">.htm</option>
-            <option value=".php">.php</option>
-            <option value=".aspx">.aspx</option>
-            <option value=".jsp">.jsp</option>
-            <option value="none">No extension</option>
-          </select>
-          <div class="example">Extension to add when converting from Edge Delivery Services to original site</div>
-        </div>
-        
-        <button id="addMapping" class="button">Add Mapping</button>
       </div>
     </div>
     
