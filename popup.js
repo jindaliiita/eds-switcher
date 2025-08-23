@@ -154,9 +154,9 @@ async function addFileExtensionIfNeeded(path, currentDomain, targetDomain) {
     console.error('Error loading extension preference:', error);
   }
   
-  // Default extension based on common patterns
-  // Most websites use .html for content pages
-  return path + '.html';
+  // No stored preference and no auto-detection - keep path as is
+  // Don't assume .html if the original URL had no extension
+  return path;
 }
 
 // Function to update the popup UI

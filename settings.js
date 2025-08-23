@@ -116,14 +116,13 @@ class DomainMappingManager {
       for (const target of edsTargets) {
         this.mappings.set(target, originalDomain.toLowerCase());
         
-        // Store extension preference for each EDS domain
-        if (detectedExtension) {
-          const extensionKey = `${target}->${originalDomain.toLowerCase()}-extension`;
-          try {
-            await chrome.storage.sync.set({ [extensionKey]: detectedExtension });
-          } catch (error) {
-            console.error('Error saving extension preference:', error);
-          }
+        // Store extension preference for each EDS domain (including 'no extension')
+        const extensionKey = `${target}->${originalDomain.toLowerCase()}-extension`;
+        const extensionValue = detectedExtension || ''; // Empty string means no extension
+        try {
+          await chrome.storage.sync.set({ [extensionKey]: extensionValue });
+        } catch (error) {
+          console.error('Error saving extension preference:', error);
         }
       }
       
@@ -146,6 +145,8 @@ class DomainMappingManager {
       statusMessage += `\n🎯 EDS targets: ${edsTargets.join(', ')}`;
       if (detectedExtension) {
         statusMessage += `\n🔧 Auto-detected file extension: ${detectedExtension}`;
+      } else {
+        statusMessage += `\n🔧 No file extension detected - URLs will remain as-is`;
       }
       this.showStatus(statusMessage, 'success');
     } catch (error) {
